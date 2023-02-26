@@ -15,7 +15,7 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
   const [name, setName] = React.useState(null)
   const [args, setArgs] = React.useState(null)
 
-  const colors = [...Array(12).keys()].map(n => n * 360/12).map(hue => hslToRgb(hue, 100, 50))
+  const colors = [0,30,60,120,240,270,300].map(hue => hslToRgb(hue, 100, 50))
   colors.push([0, 0, 0])
   colors.push([255, 255, 255])
 
