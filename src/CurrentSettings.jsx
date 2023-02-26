@@ -1,55 +1,143 @@
 import React from 'react';
-import { Stack, Button } from 'react-bootstrap'
+import { Stack, Button, Form } from 'react-bootstrap'
+import debounce from 'lodash.debounce'
 import { useHost } from './useHost';
 
 import { ColorSwatch } from './ColorSwatch'
 
+import './CurrentSettings.css'
+
 const CurrentSettings = ({settings, routine, setCurrent}) => {
   const host = useHost()
 
-  if (!settings) return null
-  if (!routine) return null
+  const [name, setName] = React.useState(null)
+  const [args, setArgs] = React.useState(null)
+
   
-  console.log('CurrentSettings', settings)
-  const { name, args: {colors, delay, length, reverse, sequence_max, spacing, surround_spacing} } = routine
-  
+  React.useEffect(() => {
+    if (!routine) return
+
+    setName(routine.name)
+    setArgs(routine.args)
+  }, [routine])
+
   const setRoutine = (name) => async () => {
-    console.log('setRoutine', name)
     const res = await fetch(host + '/routine/' + name)
     const data = await res.json()
 
     setCurrent(data)
   }
 
+  const debouncedLightupdate = debounce((arg) => {
+    let params = [];
+
+      if (args.color) {
+        for (let i = 0; i < args.color.length; i++) {
+          params.push(`color=${args.color[i].map((v) => v.toString(16).padStart(2, '0')).join('')}`);
+        }
+      }
+
+      if (args.delay !== undefined) {
+        params.push(`delay=${args.delay}`);
+      }
+
+      if (args.length !== undefined) {
+        params.push(`length=${args.length}`);
+      }
+
+      if (args.spacing !== undefined) {
+        params.push(`spacing=${args.spacing}`);
+      }
+
+      if (args.surround_spacing !== undefined) {
+        params.push(`surround_spacing=${args.surround_spacing}`);
+      }
+
+      if (args.reverse) {
+        params.push(`reverse=true`);
+      }
+
+      const url = `${host}/routine/${name}?${params.join('&')}`
+      fetch(url)
+  }, 200)
+
+  React.useEffect(() => {
+    if (args) {
+      debouncedLightupdate(args)
+    }
+  }, [args])
+
+  const updateArg = (name) => (e) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    const updatedArgs = { ...args, [name]: value }
+    setArgs(updatedArgs)
+  }
+
+  if (!settings) return null
+  if (!routine) return null
+  if (!args) return null
+  if (!name) return null
+
   return (
-    <Stack gap={3}>
-      <div>Routine</div>
-      <Stack gap={1} direction='horizontal'>
-        {settings.routines.map((routine, i) => ( <Button variant={routine === name ? "primary" : "secondary"} onClick={setRoutine(routine)}>{routine}</Button> ))}
+    <Stack gap={4}>
+      <Stack gap={1}>
+        <strong>Routine</strong>
+        <Stack gap={1} direction='horizontal'>
+          {settings.routines.map((routine, i) => ( <Button key={i} variant={routine === name ? "primary" : "secondary"} onClick={setRoutine(routine)}>{routine}</Button> ))}
+        </Stack>
       </Stack>
 
-      <div>Colors</div>
-      <Stack gap={1} direction='horizontal'>
-        {colors.map((color, i) => ( <ColorSwatch key={i} color={color} /> ))}
+      <Stack gap={1}>
+        <strong>Colors</strong>
+        <Stack gap={1} direction='horizontal'>
+          {args.colors.map((color, i) => ( <ColorSwatch key={i} color={color} /> ))}
+        </Stack>
       </Stack>
 
-      <div>Delay</div>
-      <div>{delay}</div>
+      <Stack gap={1}>
+        <strong>Delay</strong>
+        <Stack gap={2} direction='horizontal'>
+          <Form.Control type="number" value={args.delay} onChange={updateArg('delay')} min={5} max={1000} />
+          <Form.Range type="range" value={args.delay} onChange={updateArg('delay')} min={5} max={1000} step={5} />
+        </Stack>
+      </Stack>
 
-      <div>Length</div>
-      <div>{length}</div>
+      <Stack gap={1}>
+        <strong>Length</strong>
+        <Stack gap={2} direction='horizontal'>
+          <Form.Control type="number" value={args.length} onChange={updateArg('length')} min={1} max={50} />
+          <Form.Range type="range" value={args.length} onChange={updateArg('length')} min={1} max={50} />
+        </Stack>
+      </Stack>
 
-      <div>Sequence Max</div>
-      <div>{sequence_max}</div>
+      {/* <Stack gap={1}>
+        <strong>Sequence Max</strong>
+        <Stack gap={2} direction='horizontal'>
+          <Form.Control type="number" value={args.sequence_max} onChange={updateArg('sequence_max')} min={1} max={500} />
+          <Form.Range type="range" value={args.sequence_max} onChange={updateArg('sequence_max')} min={1} max={500} />
+        </Stack>
+      </Stack> */}
 
-      <div>Spacing</div>
-      <div>{spacing}</div>
+      <Stack gap={1}>
+        <strong>Spacing</strong>
+        <Stack gap={2} direction='horizontal'>
+          <Form.Control type="number" value={args.spacing} onChange={updateArg('spacing')} min={0} max={20} />
+          <Form.Range type="range" value={args.spacing} onChange={updateArg('spacing')} min={0} max={20} />
+        </Stack>
+      </Stack>
 
-      <div>Surround Spacing</div>
-      <div>{surround_spacing}</div>
+      <Stack gap={1}>
+        <strong>Surround Spacing</strong>
+        <Stack gap={2} direction='horizontal'>
+          <Form.Control type="number" value={args.surround_spacing} onChange={updateArg('surround_spacing')} min={0} max={20} />
+          <Form.Range type="range" value={args.surround_spacing} onChange={updateArg('surround_spacing')} min={0} max={20} />
+        </Stack>
+      </Stack>
 
-      <div>Reverse</div>
-      <div>{reverse}</div>
+      <Stack gap={1}>
+        <strong>Reverse</strong>
+        <Form.Check type="checkbox" label="Reverse" value={args.reverse} onChange={updateArg('reverse')} />
+      </Stack>
     </Stack>
   )
 }

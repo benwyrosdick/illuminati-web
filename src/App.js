@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import React from 'react';
 import { Stack } from 'react-bootstrap'
 import { CurrentSettings } from './CurrentSettings';
