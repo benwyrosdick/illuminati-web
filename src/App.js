@@ -32,10 +32,9 @@ const App = () => {
       <header className="App-header">
         Illuminati Web
       </header>
-      <Stack gap={3}>
+      <div class="main">
         <CurrentSettings settings={settings} routine={routine} setCurrent={setCurrentRoutine} />
-        <div>Item 2</div>
-      </Stack>
+      </div>
     </div>
   );
 }

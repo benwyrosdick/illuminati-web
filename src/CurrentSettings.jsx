@@ -7,13 +7,28 @@ import { ColorSwatch } from './ColorSwatch'
 
 import './CurrentSettings.css'
 
+const hslToRgb = (h, s, l) => {
+  l /= 100
+  const a = s * Math.min(l, 1 - l) / 100
+  const f = n => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color)
+  }
+
+  return [f(0), f(8), f(4)]
+}
+
 const CurrentSettings = ({settings, routine, setCurrent}) => {
   const host = useHost()
 
   const [name, setName] = React.useState(null)
   const [args, setArgs] = React.useState(null)
 
-  
+  const colors = [...Array(12).keys()].map(n => n * 360/12).map(hue => hslToRgb(hue, 100, 50))
+  colors.push([0, 0, 0])
+  colors.push([255, 255, 255])
+
   React.useEffect(() => {
     if (!routine) return
 
@@ -22,43 +37,59 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
   }, [routine])
 
   const setRoutine = (name) => async () => {
-    const res = await fetch(host + '/routine/' + name)
+    let params = [];
+
+    if (args.colors) {
+      for (let i = 0; i < args.colors.length; i++) {
+        params.push(`color=${args.colors[i].map((v) => v.toString(16).padStart(2, '0')).join('')}`);
+      }
+    }
+    
+    const url = `${host}/routine/${name}?${params.join('&')}`
+    const res = await fetch(url)
     const data = await res.json()
 
     setCurrent(data)
   }
 
-  const debouncedLightupdate = debounce((arg) => {
+  const debouncedLightupdate = debounce(async (arg) => {
     let params = [];
 
-      if (args.color) {
-        for (let i = 0; i < args.color.length; i++) {
-          params.push(`color=${args.color[i].map((v) => v.toString(16).padStart(2, '0')).join('')}`);
-        }
+    if (args.colors) {
+      for (let i = 0; i < args.colors.length; i++) {
+        params.push(`color=${args.colors[i].map((v) => v.toString(16).padStart(2, '0')).join('')}`);
       }
+    }
 
-      if (args.delay !== undefined) {
-        params.push(`delay=${args.delay}`);
-      }
+    if (args.delay !== undefined) {
+      params.push(`delay=${args.delay}`);
+    }
 
-      if (args.length !== undefined) {
-        params.push(`length=${args.length}`);
-      }
+    if (args.length !== undefined) {
+      params.push(`length=${args.length}`);
+    }
 
-      if (args.spacing !== undefined) {
-        params.push(`spacing=${args.spacing}`);
-      }
+    if (args.spacing !== undefined) {
+      params.push(`spacing=${args.spacing}`);
+    }
 
-      if (args.surround_spacing !== undefined) {
-        params.push(`surround_spacing=${args.surround_spacing}`);
-      }
+    if (args.spread !== undefined) {
+      params.push(`spread=${args.spread}`);
+    }
 
-      if (args.reverse) {
-        params.push(`reverse=true`);
-      }
+    if (args.surround_spacing !== undefined) {
+      params.push(`surround_spacing=${args.surround_spacing}`);
+    }
 
-      const url = `${host}/routine/${name}?${params.join('&')}`
-      fetch(url)
+    if (args.reverse) {
+      params.push(`reverse=true`);
+    }
+
+    const url = `${host}/routine/${name}?${params.join('&')}`
+    const res = await fetch(url)
+    const data = await res.json()
+
+    // setCurrent(data)
   }, 200)
 
   React.useEffect(() => {
@@ -70,6 +101,16 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
   const updateArg = (name) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     const updatedArgs = { ...args, [name]: value }
+    setArgs(updatedArgs)
+  }
+
+  const removeColor = (idx) => () => {
+    const updatedArgs = { ...args, colors: args.colors.filter((c, i) => i !== idx) }
+    setArgs(updatedArgs)
+  }
+
+  const addColor = (color) => () => {
+    const updatedArgs = { ...args, colors: [...args.colors, color] }
     setArgs(updatedArgs)
   }
 
@@ -88,9 +129,16 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
       </Stack>
 
       <Stack gap={1}>
-        <strong>Colors</strong>
+        <strong>Current Colors</strong>
         <Stack gap={1} direction='horizontal'>
-          {args.colors.map((color, i) => ( <ColorSwatch key={i} color={color} /> ))}
+          {args.colors.map((color, i) => ( <ColorSwatch key={i} color={color} handler={removeColor(i)} /> ))}
+        </Stack>
+      </Stack>
+
+      <Stack gap={1}>
+        <strong>Available Colors</strong>
+        <Stack gap={1} direction='horizontal'>
+          {colors.map((color, i) => ( <ColorSwatch key={i} color={color} handler={addColor(color)} /> ))}
         </Stack>
       </Stack>
 
@@ -107,6 +155,14 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
         <Stack gap={2} direction='horizontal'>
           <Form.Control type="number" value={args.length} onChange={updateArg('length')} min={1} max={50} />
           <Form.Range type="range" value={args.length} onChange={updateArg('length')} min={1} max={50} />
+        </Stack>
+      </Stack>
+
+      <Stack gap={1}>
+        <strong>Spread</strong>
+        <Stack gap={2} direction='horizontal'>
+          <Form.Control type="number" value={args.spread} onChange={updateArg('spread')} min={0} max={30} />
+          <Form.Range type="range" value={args.spread} onChange={updateArg('spread')} min={0} max={30} />
         </Stack>
       </Stack>
 

@@ -2,12 +2,12 @@ import React from 'react';
 
 import './ColorSwatch.css'
 
-const ColorSwatch = ({color}) => {
+const ColorSwatch = ({color, handler}) => {
   if (!color) return null
 
   return (
     <div>
-      <div className="swatch" style={{backgroundColor: `rgb(${color.join(',')})`}} />
+      <div className="swatch" onClick={handler} style={{backgroundColor: `rgb(${color.join(',')})`}} />
     </div>
   )
 }
