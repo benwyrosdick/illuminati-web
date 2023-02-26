@@ -1,6 +1,11 @@
 import React from 'react';
 
-const HostContext = React.createContext(null)
+const HostInfo = {
+  host: null,
+  setHost: () => {},
+}
+
+const HostContext = React.createContext(HostInfo)
 const useHost = () => React.useContext(HostContext)
 
 export {

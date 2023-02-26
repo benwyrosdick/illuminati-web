@@ -2,25 +2,15 @@ import React from 'react';
 import { Stack, Button, Form } from 'react-bootstrap'
 import debounce from 'lodash.debounce'
 import { useHost } from './useHost';
+import { hslToRgb, rgbToHex } from './colorHelpers'
 
 import { ColorSwatch } from './ColorSwatch'
+import { Theme } from './Theme'
 
 import './CurrentSettings.css'
 
-const hslToRgb = (h, s, l) => {
-  l /= 100
-  const a = s * Math.min(l, 1 - l) / 100
-  const f = n => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color)
-  }
-
-  return [f(0), f(8), f(4)]
-}
-
 const CurrentSettings = ({settings, routine, setCurrent}) => {
-  const host = useHost()
+  const { host } = useHost()
 
   const [name, setName] = React.useState(null)
   const [args, setArgs] = React.useState(null)
@@ -41,7 +31,7 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
 
     if (args.colors) {
       for (let i = 0; i < args.colors.length; i++) {
-        params.push(`color=${args.colors[i].map((v) => v.toString(16).padStart(2, '0')).join('')}`);
+        params.push(`color=${rgbToHex(...args.colors[i])}`);
       }
     }
     
@@ -57,7 +47,7 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
 
     if (args.colors) {
       for (let i = 0; i < args.colors.length; i++) {
-        params.push(`color=${args.colors[i].map((v) => v.toString(16).padStart(2, '0')).join('')}`);
+        params.push(`color=${rgbToHex(...args.colors[i])}`);
       }
     }
 
@@ -90,7 +80,7 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
     const data = await res.json()
 
     // setCurrent(data)
-  }, 200)
+  }, 100)
 
   React.useEffect(() => {
     if (args) {
@@ -111,6 +101,11 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
 
   const addColor = (color) => () => {
     const updatedArgs = { ...args, colors: [...args.colors, color] }
+    setArgs(updatedArgs)
+  }
+
+  const setColors = (colors) => () => {
+    const updatedArgs = { ...args, colors }
     setArgs(updatedArgs)
   }
 
@@ -139,6 +134,13 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
         <strong>Available Colors</strong>
         <Stack gap={1} direction='horizontal'>
           {colors.map((color, i) => ( <ColorSwatch key={i} color={color} handler={addColor(color)} /> ))}
+        </Stack>
+      </Stack>
+
+      <Stack gap={1}>
+        <strong>Available Themes</strong>
+        <Stack gap={1} direction='horizontal'>
+          {Object.entries(settings.themes).map(([name, colors], i) => ( <Theme key={i} name={name} colors={colors} handler={setColors(colors)} /> ))}
         </Stack>
       </Stack>
 

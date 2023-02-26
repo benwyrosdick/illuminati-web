@@ -1,16 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React from 'react';
-import { Stack } from 'react-bootstrap'
 import { CurrentSettings } from './CurrentSettings';
-import { useHost } from './useHost';
+import { HostContext } from './useHost';
 
 import './App.css';
 
 const App = () => {
+  const [host, setHost] = React.useState('http://10.0.0.50:5000')
   const [settings, setCurrentSettings] = React.useState()
   const [routine, setCurrentRoutine] = React.useState()
-  const host = useHost()
 
   const loadData = async () => {
     const res = await fetch(host)
@@ -32,8 +31,10 @@ const App = () => {
       <header className="App-header">
         Illuminati Web
       </header>
-      <div class="main">
-        <CurrentSettings settings={settings} routine={routine} setCurrent={setCurrentRoutine} />
+      <div className="main">
+        <HostContext.Provider value={{host, setHost}}>
+          <CurrentSettings settings={settings} routine={routine} setCurrent={setCurrentRoutine} />
+        </HostContext.Provider>
       </div>
     </div>
   );
