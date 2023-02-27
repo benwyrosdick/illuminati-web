@@ -29,14 +29,19 @@ const App = () => {
 
   return (
     <div className="App">
-      <Stack className="App-header" gap={2}>
+      <header className="App-header">
         Illuminati Web
-        <Form.Control type="text" value={host} onChange={e => setHost(e.target.value)} />
-      </Stack>
+      </header>
       <div className="main">
-        <HostContext.Provider value={{host, setHost}}>
-          <CurrentSettings settings={settings} routine={routine} setCurrent={setCurrentRoutine} />
-        </HostContext.Provider>
+        <Stack gap={4}>
+          <Stack gap={1}>
+            <strong>Host</strong>
+            <Form.Control className='host-input' type="text" value={host} onChange={e => setHost(e.target.value)} />
+          </Stack>
+          <HostContext.Provider value={{host, setHost}}>
+            <CurrentSettings settings={settings} routine={routine} setCurrent={setCurrentRoutine} />
+          </HostContext.Provider>
+        </Stack>
       </div>
     </div>
   );

@@ -11,3 +11,7 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
 }
+
+.host-input {
+  width: 600px !important;
+}
