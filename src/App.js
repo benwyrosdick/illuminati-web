@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React from 'react';
+import { Stack, Form } from 'react-bootstrap'
 import { CurrentSettings } from './CurrentSettings';
 import { HostContext } from './useHost';
 
 import './App.css';
 
 const App = () => {
-  const [host, setHost] = React.useState('http://10.0.0.50:5000')
+  const [host, setHost] = React.useState('http://10.0.0.13:5000')
   const [settings, setCurrentSettings] = React.useState()
   const [routine, setCurrentRoutine] = React.useState()
 
@@ -28,9 +29,10 @@ const App = () => {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <Stack className="App-header" gap={2}>
         Illuminati Web
-      </header>
+        <Form.Control type="text" value={host} onChange={e => setHost(e.target.value)} />
+      </Stack>
       <div className="main">
         <HostContext.Provider value={{host, setHost}}>
           <CurrentSettings settings={settings} routine={routine} setCurrent={setCurrentRoutine} />

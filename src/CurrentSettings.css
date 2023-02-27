@@ -1,7 +1,7 @@
-.form-control {
+.CurrentSettings .form-control {
   width: 100px !important;
 }
 
-.form-range {
+.CurrentSettings .form-range {
   width: 300px !important;
 }

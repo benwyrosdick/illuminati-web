@@ -113,7 +113,7 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
   if (!name) return null
 
   return (
-    <Stack gap={4}>
+    <Stack gap={4} className='CurrentSettings'>
       <Stack gap={1}>
         <strong>Routine</strong>
         <Stack gap={1} direction='horizontal'>
