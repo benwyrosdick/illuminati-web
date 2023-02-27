@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { Stack, Button, Form } from 'react-bootstrap'
 import debounce from 'lodash.debounce'
@@ -76,10 +77,7 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
     }
 
     const url = `${host}/routine/${name}?${params.join('&')}`
-    const res = await fetch(url)
-    const data = await res.json()
-
-    // setCurrent(data)
+    fetch(url)
   }, 100)
 
   React.useEffect(() => {

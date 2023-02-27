@@ -2,4 +2,21 @@
   width: 100px;
   height: 100px;
   border: 1px solid darkgrey;
+
+  display: flex;
+}
+
+.swatch span {
+  font-size: small;
+  display: inline-block;
+  align-self: flex-end;
+}
+
+.light {
+  color: white;
+  mix-blend-mode: difference;
+}
+
+.dark {
+  color: black;
 }
