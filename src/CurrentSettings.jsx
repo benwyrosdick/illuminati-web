@@ -11,7 +11,7 @@ import { Theme } from './Theme'
 import './CurrentSettings.css'
 
 const CurrentSettings = ({settings, routine, setCurrent}) => {
-  const { host, setHost } = useHost()
+  const { host } = useHost()
 
   const [name, setName] = React.useState(null)
   const [args, setArgs] = React.useState(null)
