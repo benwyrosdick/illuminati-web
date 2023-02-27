@@ -8,7 +8,7 @@ import { HostContext } from './useHost';
 import './App.css';
 
 const App = () => {
-  const [host, setHost] = React.useState('http://10.0.0.13:5000')
+  const [host, setHost] = React.useState('http://rgbmap.local:5000')
   const [settings, setCurrentSettings] = React.useState()
   const [routine, setCurrentRoutine] = React.useState()
 
