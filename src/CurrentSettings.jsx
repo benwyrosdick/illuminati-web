@@ -3,7 +3,7 @@ import React from 'react';
 import { Stack, Button, Form } from 'react-bootstrap'
 import debounce from 'lodash.debounce'
 import { useHost } from './useHost';
-import { hslToRgb, rgbToHex } from './colorHelpers'
+import { hslToRgb, rgbToHex, hexToRgb } from './colorHelpers'
 
 import { ColorSwatch } from './ColorSwatch'
 import { Theme } from './Theme'
@@ -15,10 +15,9 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
 
   const [name, setName] = React.useState(null)
   const [args, setArgs] = React.useState(null)
+  const [customColor, setCustomColor] = React.useState([255,255,255])
 
   const colors = [0,30,60,120,240,270,300].map(hue => hslToRgb(hue, 100, 50))
-  colors.push([0, 0, 0])
-  colors.push([255, 255, 255])
 
   React.useEffect(() => {
     if (!routine) return
@@ -132,6 +131,8 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
         <strong>Available Colors</strong>
         <Stack gap={1} direction='horizontal'>
           {colors.map((color, i) => ( <ColorSwatch key={i} color={color} handler={addColor(color)} /> ))}
+          <ColorSwatch color={customColor} handler={addColor(customColor)} />
+          <input type="color" defaultValue={"#" + rgbToHex(...customColor)} onChange={(e) => {setCustomColor(hexToRgb(e.target.value))}} />
         </Stack>
       </Stack>
 

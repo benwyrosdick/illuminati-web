@@ -15,6 +15,11 @@ const rgbToHex = (r, g, b) => {
   return `${rgb.map(c => c.toString(16).padStart(2, '0')).join('')}`
 }
 
+const hexToRgb = (hex) => {
+  const rgb = hex.match(/[a-f\d]{2}/gi).map(c => parseInt(c, 16))
+  return rgb
+}
+
 const hslToHex = (h, s, l) => {
   const rgb = hslToRgb(h, s, l)
   return rgbToHex(...rgb)
@@ -24,4 +29,5 @@ export {
   hslToRgb,
   hslToHex,
   rgbToHex,
+  hexToRgb,
 }
