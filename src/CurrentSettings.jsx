@@ -34,6 +34,10 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
         params.push(`color=${rgbToHex(...args.colors[i])}`);
       }
     }
+
+    if (args.brightness !== undefined) {
+      params.push(`brightness=${args.brightness}`);
+    }
     
     const url = `${host}/routine/${name}?${params.join('&')}`
     const res = await fetch(url)
@@ -49,6 +53,10 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
       for (let i = 0; i < args.colors.length; i++) {
         params.push(`color=${rgbToHex(...args.colors[i])}`);
       }
+    }
+
+    if (args.brightness !== undefined) {
+      params.push(`brightness=${args.brightness}`);
     }
 
     if (args.delay !== undefined) {
@@ -140,6 +148,14 @@ const CurrentSettings = ({settings, routine, setCurrent}) => {
         <strong>Available Themes</strong>
         <Stack gap={1} direction='horizontal'>
           {Object.entries(settings.themes).map(([name, colors], i) => ( <Theme key={i} name={name} colors={colors} handler={setColors(colors)} /> ))}
+        </Stack>
+      </Stack>
+
+      <Stack gap={1}>
+        <strong>Brightness</strong>
+        <Stack gap={2} direction='horizontal'>
+          <Form.Control type="number" value={args.brightness} onChange={updateArg('brightness')} min={5} max={100} />
+          <Form.Range type="range" value={args.brightness} onChange={updateArg('brightness')} min={5} max={100} step={5} />
         </Stack>
       </Stack>
 
